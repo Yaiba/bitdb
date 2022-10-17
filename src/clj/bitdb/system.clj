@@ -7,10 +7,10 @@
 
 (defn new-system
   "Constructs a system map"
-  [config]
-  (let [{:keys [database server]} config]
-    (component/system-map
-     :database (new-database database)
-     :server (component/using (new-web-server server)
-              [:database] ;; dependency
-              ))))
+  [{:keys [bb-db bb-server bb-run-mode] :as config}]
+  (component/system-map
+   :database (new-database bb-db)
+   :server (component/using
+            (new-web-server bb-server)
+            [:database] ;; dependency
+            )))

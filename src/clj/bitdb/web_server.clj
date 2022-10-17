@@ -11,7 +11,8 @@
       this
       (assoc this :http-server
              (jetty/run-jetty (app {:database database})
-                              config))))
+                              {:port (:bb-jetty-port config)
+                               :join? (:bb-jetty-join config)}))))
   (stop [this]
     (println ";; Stopping web server")
     (when http-server

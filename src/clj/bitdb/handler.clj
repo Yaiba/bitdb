@@ -6,13 +6,6 @@
             [ring.middleware.params :as params]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]))
 
-(defn hello [request]
-  (-> (resp/response "Hello BitDB")
-      (resp/content-type "text/html")))
-  ;; {:status 200
-  ;;  :headers {"Content-Type" "text/html"}
-  ;;  :body "Hello Ring"}
-
 (defn request-ip
   ([request]
    {:status 200
@@ -22,7 +15,7 @@
    (respond (request-ip request))))
 
 (compojure/defroutes app-routes
-  (compojure/GET "/" [] "Hello BitDB")
+  (compojure/GET "/" [] "Hello BitDB ooooo")
   (route/not-found "Not Found"))
 
 (defn components-request

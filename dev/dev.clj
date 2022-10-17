@@ -20,30 +20,21 @@
    [clojure.tools.namespace.repl :refer [refresh refresh-all clear]]
    [com.stuartsierra.component :as component]
    [com.stuartsierra.component.repl :refer [reset set-init start stop system]]
-   [bitdb.system :refer [new-system]]))
+   [bitdb.system :refer [new-system]]
+   [bitdb.config :refer [load-config]]
+   [environ.core :refer [env]]
+   ))
 
 ;; Do not try to load source code from 'resources' directory
 (clojure.tools.namespace.repl/set-refresh-dirs "dev" "src" "test")
 
-(comment (defn dev-system
-           "Constructs a system map suitable for interactive development."
-           []
-           (component/system-map
-            ;; TODO
-            )))
 
-(def dev-system new-system)
+(defn dev-system
+  []
+  (new-system (load-config env)))
 
-(def dev-config
-  {:database {:host "127.0.0.1"
-              :port 3399
-              :password "sdsd"
-              :user "ok"
-              :dbname "bit"}
-   :server {:port 3000
-            :join? false}})
 
-(set-init (fn [_] (dev-system dev-config)))
+(set-init (fn [_] (dev-system)))
 
 
 

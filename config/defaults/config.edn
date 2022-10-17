@@ -1,0 +1,9 @@
+{:databse {:host "127.0.0.1"
+           :port 3006
+           :user ""
+           :pass ""
+           :dbtype "mysql"
+           :dbname ""}
+ :server {:port 3000
+          :join? false}
+ }
