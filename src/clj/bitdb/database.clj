@@ -1,35 +1,29 @@
 (ns bitdb.database
-  (:require [com.stuartsierra.component :as component]))
+  (:require [com.stuartsierra.component :as component]
+            [next.jdbc :as jdbc]
+            [next.jdbc.sql :as jsql]
+            [next.jdbc.specs :as jspec]
+            [next.jdbc.connection :as connection])
+  (:import [com.zaxxer.hikari HikariDataSource]))
 
-(defprotocol DBQuery
-  (select [db query]))
-
-(defrecord Database [config conn]
-  component/Lifecycle
-  (start [this]
-    (println ";; Starting database")
-    (let [_conn (str config)]
-      (assoc this :conn conn)))
-  (stop [this]
-    (println ";; Stopping database")
-    ;(.close (:conn this))
-    (when conn
-      (try
-        ;;(.close conn)
-        (println "close databse")
-        (catch Exception e
-          (println e "Error while stopping database"))))
-    (assoc this :conne nil))
-
-  DBQuery
-  (select [_ query]
-    ))
+(def db-type "mysql")
 
 (defn new-database
-  "Returns database component from config"
   [config]
-  (map->Database {:config config}))
+  (let [db-spec {:jdbcUrl (:bb-db-jdbcurl config)
+                 :username (:bb-db-user config)
+                 :password (:bb-db-pass config)
+                 :dbtype db-type
+                 :dbname (:bb-db-name config)
+                 :port (:bb-db-port config)
+                 :host (:bb-db-host config)}]
+    {:database (connection/component HikariDataSource db-spec)}))
 
+;; instrument specifications
+;; Require the `next.jdbc.specs`
+(comment ;; 
+  (jspec/instrument)
+  (jspec/unstrument))
 
 (defn query [q]
   ())

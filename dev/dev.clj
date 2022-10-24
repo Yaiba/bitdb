@@ -23,15 +23,34 @@
    [bitdb.system :refer [new-system]]
    [bitdb.config :refer [load-config]]
    [environ.core :refer [env]]
+   [bitdb.graphql-schema :as qs]
+   [com.walmartlabs.lacinia :as l]
    ))
 
 ;; Do not try to load source code from 'resources' directory
 (clojure.tools.namespace.repl/set-refresh-dirs "dev" "src" "test")
 
 
+(def schema (qs/load-schema nil))
+
+(defn q
+  [query-string]
+  (l/execute schema query-string nil nil))
+
 (defn dev-system
   []
   (new-system (load-config env)))
+
+(defn get-db-spec
+  [config]
+  {;:jdbcUrl {:bb-db-jdbcurl config}
+     :user (:bb-db-user config)
+     :password (:bb-db-pass config)
+     :dbtype "mysql"
+     :dbname (:bb-db-name config)
+     :port (:bb-db-port config)
+     :host (:bb-db-host config)})
+
 
 
 (set-init (fn [_] (dev-system)))

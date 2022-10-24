@@ -1,0 +1,27 @@
+{:enums
+ {:RecordType
+  {:description "The type of a record."
+   :values [:address :profile :custom_key]}}
+
+ :objects
+ {:Record
+  {:description "Record info of a bit account."
+   :fields
+   {:id {:type (non-null ID)}
+    :account_id {:type (non-null String)}
+    :account {:type (non-null String)}
+    :key {:type (non-null String)}
+    :type {:type :RecordType}
+    :label {:type String}
+    :value {:type (non-null String)}
+    :ttl {:type Int}
+    :created_at {:type Int}
+    :updated_at {:type Int}
+    :parent_account_id {:type String}}}
+  }
+ :queries
+ {:records_by_account
+  {:type (list :Record)
+   :descriptiong "Access records by its account, if any"
+   :args {:account {:type String}}
+   :resolve :query/records-by-account}}} 

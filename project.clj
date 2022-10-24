@@ -10,11 +10,13 @@
                  [ring/ring-core "1.9.6"]
                  [ring/ring-jetty-adapter "1.9.6"]
                  [ring/ring-defaults "0.3.4"]
+                 [com.walmartlabs/lacinia "1.2-alpha-3"]
 
                  ; DB
                  [com.github.seancorfield/next.jdbc "1.3.834"]
                  [com.github.seancorfield/honeysql "2.3.928"]
                  [mysql/mysql-connector-java "8.0.19"]
+                 [com.zaxxer/HikariCP "4.0.3"]
 
                  ; build tools
                  [environ "1.2.0"]
@@ -32,6 +34,7 @@
   :profiles {:dev [:project/dev :profiles/dev]
              :profiles/dev {}
              :project/dev {:main user
+                           :resource-paths ["dev/resources"]
                            :source-paths ["dev"]
                            :dependencies [[javax.servlet/servlet-api "2.5"]
                                           [ring/ring-mock "0.3.2"]

@@ -1,10 +1,15 @@
 (ns bitdb.handler
   (:require [compojure.core :as compojure]
-            [compojure.route :as route]
+            [compojure.route :as compojure-route]
             [ring.util.response :as resp]
+            [ring.util.request :as req]
+            [clojure.data.json :as json]
+            [com.walmartlabs.lacinia :as lacinia]
             [ring.middleware.content-type :as ct]
             [ring.middleware.params :as params]
-            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]))
+            [ring.middleware.resource :as resource]
+            ;[ring.middleware.defaults :refer [wrap-defaults site-defaults]]
+            ))
 
 (defn request-ip
   ([request]
@@ -14,9 +19,20 @@
   ([request respond raise]
    (respond (request-ip request))))
 
+(defn graphql-handler
+  [request]
+  (let [graphql-request (json/read-str (req/body-string request) :key-fn keyword)
+        {:keys [query variables]} graphql-request
+        result (lacinia/execute (:schema request) query variables nil)]
+    (-> (json/write-str result)
+        resp/response
+        (resp/content-type "application/json"))))
+
 (compojure/defroutes app-routes
   (compojure/GET "/" [] "Hello BitDB ooooo")
-  (route/not-found "Not Found"))
+  (compojure/GET "/req" request (str request))
+  (compojure/POST "/graphql" request (graphql-handler request))
+  (compojure-route/not-found "Not Found"))
 
 (defn components-request
   [request components]
@@ -31,6 +47,7 @@
 
 (defn app [components]
   (-> app-routes
-      (wrap-defaults site-defaults)
+      ;(wrap-defaults site-defaults)
+      (resource/wrap-resource "static")
+      ct/wrap-content-type
       (wrap-components components)))
-

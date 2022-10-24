@@ -21,16 +21,16 @@
              sorted-keys)))))
 
 (def test-env
-  {:bb-db-port "4444"
-   :bb-db-host "localhost"
-   :bb-db-user "user"
+  {:bb-db-user "user"
    :bb-run-mode "dev"
-   :bb-jetty-join "false"})
+   :bb-jetty-join "false"
+   :bb-jetty-port "3000"
+   :bb-jetty-host "localhost"})
 
 (deftest config-parsing
   (testing "load sub config type int"
-    (is (= {:bb-db-port 4444}
-           (config/load-sub-config test-env :bb-db-port))))
+    (is (= {:bb-jetty-port 3000}
+           (config/load-sub-config test-env :bb-jetty-port))))
   (testing "load sub config type keyword"
     (is (= {:bb-run-mode :dev}
            (config/load-sub-config test-env :bb-run-mode))))
@@ -38,19 +38,18 @@
     (is (= {:bb-jetty-join false}
            (config/load-sub-config test-env :bb-jetty-join))))
   (testing "load sub config type ip localhost"
-    (is (= {:bb-db-host "localhost"}
-           (config/load-sub-config test-env :bb-db-host))))
+    (is (= {:bb-jetty-host "localhost"}
+           (config/load-sub-config test-env :bb-jetty-host))))
   (testing "load sub config type ip addr"
-    (let [test-env (assoc test-env :bb-db-host "2.2.2.2")]
-      (is (= {:bb-db-host "2.2.2.2"}
-             (config/load-sub-config test-env :bb-db-host)))))
+    (let [test-env (assoc test-env :bb-jetty-host "2.2.2.2")]
+      (is (= {:bb-jetty-host "2.2.2.2"}
+             (config/load-sub-config test-env :bb-jetty-host)))))
   (testing "load sub config map with missing field"
-    (is (= {:bb-db nil}
-           (config/load-sub-config test-env :bb-db))))
+    (let [test-env (dissoc test-env :bb-jetty-port)]
+      (is (= {:bb-server nil}
+             (config/load-sub-config test-env :bb-server)))))
   (testing "load sub config map"
-    (let [test-env (assoc test-env :bb-db-pass "pass")]
-      (is (= {:bb-db {:bb-db-port 4444
-                      :bb-db-host "localhost"
-                      :bb-db-user "user"
-                      :bb-db-pass "pass"}}
-             (config/load-sub-config test-env :bb-db))))))
+    (is (= {:bb-server {:bb-jetty-port 3000
+                        :bb-jetty-host "localhost"
+                        :bb-jetty-join false}}
+           (config/load-sub-config test-env :bb-server)))))

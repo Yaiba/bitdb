@@ -88,14 +88,17 @@
 
 (s/def ::bb-db-user ::significant-string)
 (s/def ::bb-db-pass ::significant-string)
+(s/def ::bb-db-name ::significant-string)
 (s/def ::bb-db-host ::ip-addr)
 (s/def ::bb-db-port ::->int)
-(s/def ::bb-db-url ::significant-string)
+(s/def ::bb-db-jdbcurl ::significant-string)
 (s/def ::bb-db
   (s/keys :req-un [::bb-db-user
                    ::bb-db-pass
                    ::bb-db-host
-                   ::bb-db-port]))
+                   ::bb-db-port
+                   ::bb-db-name
+                   ::bb-db-jdbcurl]))
 (s/def ::config
   (s/keys :req-un [::bb-db
                    ::bb-server
@@ -170,3 +173,14 @@
     (let [cfg-keys (spec->keys ::config)
           load-fn (partial load-sub-config env)]
       (into {} (map load-fn cfg-keys)))))
+
+(defrecord Config [config]
+  component/Lifecycle
+  (start [this]
+    (assoc this :config (load-config env/env)))
+  (stop [this]
+    (assoc this :config nil)))
+
+(defn new-config
+  []
+  {:config (map->Config {})})
