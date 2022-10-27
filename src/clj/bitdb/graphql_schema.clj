@@ -3,26 +3,19 @@
             [com.walmartlabs.lacinia.util :as util]
             [com.walmartlabs.lacinia.schema :as schema]
             [com.stuartsierra.component :as component]
+            [bitdb.database :as database]
             [clojure.edn :as edn]))
 
 ;; account-id = blake2b(b'ACCOUNT.bit', person="ckb-default-hash", digest-size=32)
 
-(defn resolve-records-by-account
-  [bit-map context args value]
-  (let [{:keys [account]} args]
-    (get bit-map account)))
+(defn record-info-by-account
+  [component]
+  (fn [_ args _]
+    (database/list-record-by-account (:database component) (:account args))))
 
 (defn resolver-map
   [component]
-  (let [bit-data (-> (io/resource "data/bit-data.edn")
-                     slurp
-                     edn/read-string)
-        bit-map (->> bit-data
-                     :records
-                     (reduce #(assoc %1 (:account %2) (conj (get %1 (:account %2) []) %2)) {}))]
-    {:query/general-query (fn [context args value] nil)
-     :query/records-by-account (partial resolve-records-by-account bit-map)}))
-
+  {:query/record-info-by-account (record-info-by-account component)})
 
 (defn load-schema
   "Load schema from resource."
@@ -33,7 +26,7 @@
       (util/attach-resolvers (resolver-map component))
       schema/compile))
 
-(defrecord SchemaProvider [schema]
+(defrecord SchemaProvider [schema mockdb]
   component/Lifecycle
   (start [this]
     (assoc this :schema (load-schema this)))
@@ -42,4 +35,5 @@
 
 (defn new-schema-provider
   []
-  {:schema-provider (map->SchemaProvider {})})
+  {:schema-provider (component/using (map->SchemaProvider {})
+                                     [:database])})

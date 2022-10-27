@@ -4,24 +4,24 @@
    :values [:address :profile :custom_key]}}
 
  :objects
- {:Record
+ {:RecordsInfo
   {:description "Record info of a bit account."
    :fields
-   {:id {:type (non-null ID)}
-    :account_id {:type (non-null String)}
+   {:account_id {:type (non-null String)
+                 :description "Hash of account"}
     :account {:type (non-null String)}
-    :key {:type (non-null String)}
-    :type {:type :RecordType}
+    :key {:type String}
+    :type {:type String}
     :label {:type String}
-    :value {:type (non-null String)}
-    :ttl {:type Int}
-    :created_at {:type Int}
-    :updated_at {:type Int}
-    :parent_account_id {:type String}}}
-  }
+    :value {:type String}
+    :created_at {:type (non-null String)}
+    :updated_at {:type String}
+    :parent_account_id {:type String}}}}
+
  :queries
- {:records_by_account
-  {:type (list :Record)
-   :descriptiong "Access records by its account, if any"
+ {:record_info_by_account
+  {:type (list :RecordsInfo)
+   :descriptiong "Access record info by its account, if any"
    :args {:account {:type String}}
-   :resolve :query/records-by-account}}} 
+   :resolve :query/record-info-by-account}}
+}

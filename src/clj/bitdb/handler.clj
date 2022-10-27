@@ -51,3 +51,4 @@
       (resource/wrap-resource "static")
       ct/wrap-content-type
       (wrap-components components)))
+

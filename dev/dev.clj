@@ -23,7 +23,6 @@
    [bitdb.system :refer [new-system]]
    [bitdb.config :refer [load-config]]
    [environ.core :refer [env]]
-   [bitdb.graphql-schema :as qs]
    [com.walmartlabs.lacinia :as l]
    ))
 
@@ -31,11 +30,12 @@
 (clojure.tools.namespace.repl/set-refresh-dirs "dev" "src" "test")
 
 
-(def schema (qs/load-schema nil))
-
 (defn q
   [query-string]
-  (l/execute schema query-string nil nil))
+  (-> system
+      :schema-provider
+      :schema
+      (l/execute query-string nil nil)))
 
 (defn dev-system
   []
