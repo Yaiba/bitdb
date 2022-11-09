@@ -4,10 +4,78 @@
    :values [:address :profile :custom_key]}}
 
  :objects
- {:RecordsInfo
-  {:description "Record info of a bit account."
+ {:AccountInfo
+  {:description "Basic account info."
    :fields
    {:account_id {:type (non-null String)
+                 :description "Hash of account"}
+    :account {:type (non-null String)
+              :description "Full account string. Indexed."}
+    :parent_account_id {:type (non-null String)
+                        :description "Indexed."}
+    :owner_chain_type {:type (non-null Int)}
+    :owner {:type (non-null String)}
+    :manager_chain_type {:type (non-null Int)}
+    :manager {:type (non-null String)}
+    :status {:type (non-null Int)}
+    :enable_sub_account {:type (non-null Int)}
+    :renew_sub_account_price {:type (non-null Int)}
+    :nonce {:type (non-null Int)}
+    :registered_at {:type (non-null Int)}
+    :expired_at {:type (non-null Int)}
+    :created_at {:type (non-null String)
+                 :description "Indexed."}
+    :updated_at {:type (non-null String)}
+    :records {:type (non-null (list :RecordsInfo))
+              :description "Records of this account"
+              :resolve :Account/records}
+    :inviters {:type (list :InviterInfo)
+               :description "Inviter info of the account"
+               :resolve :Account/inviters}
+    :trade_deals {:type (list :TradeDealInfo)
+                  :description "Trade deals related to this account"
+                  :resolve :Account/trade-deals}
+    }}
+
+  :TradeDealInfo
+  {:description "Trade deal info related to an account"
+   :fields
+   {:id {:type (non-null Int)}
+    :account_id {:type (non-null String)
+                 :description "Hash of account"}
+    :account {:type (non-null String)}
+    :deal_type {:type (non-null Int)
+                :description "0: sale 1: auction"}
+    :sell_chain_type {:type (non-null Int)}
+    :sell_address {:type (non-null String)}
+    :buy_chain_type {:type (non-null Int)}
+    :buy_address {:type (non-null String)}
+    :price_usd {:type Float}
+    :price_ckb {:type Float}
+    :created_at {:type (non-null String)}
+    :updated_at {:type (non-null String)}}}
+
+  :InviterInfo
+  {:description "Rebate info related to an account"
+   :fields
+   {:id {:type (non-null Int)}
+    :inviter_account {:type (non-null String)}
+    :inviter_chain_type {:type (non-null Int)}
+    :inviter_address {:type (non-null String)}
+    :service_type {:type (non-null Int)
+                   :description "1: register 2: trade" }
+    :reward_type {:type (non-null Int)
+                  :description "1: invite 2: channel" }
+    :reward {:type (non-null Float)}
+    :created_at {:type (non-null String)}
+    :updated_at {:type (non-null String)}
+    }}
+
+  :RecordsInfo
+  {:description "Record info of a bit account."
+   :fields
+   {:id {:type (non-null Int)}
+    :account_id {:type (non-null String)
                  :description "Hash of account"}
     :account {:type (non-null String)}
     :key {:type String}
@@ -16,12 +84,33 @@
     :value {:type String}
     :created_at {:type (non-null String)}
     :updated_at {:type String}
-    :parent_account_id {:type String}}}}
+    :parent_account_id {:type String}}}} 
 
  :queries
- {:record_info_by_account
+ {:records_info_by_account
   {:type (list :RecordsInfo)
-   :descriptiong "Access record info by its account, if any"
-   :args {:account {:type String}}
-   :resolve :query/record-info-by-account}}
-}
+   :description "Access record info by its account, if any"
+   :args
+   {:account {:type (non-null String)}}
+   :resolve :query/records-info-by-account}
+  :account_info_by_account
+  {:type :AccountInfo
+   :description "Access account info by account string, if any"
+   :args
+   {:account {:type (non-null String)}}
+   :resolve :query/account-info-by-account}
+  :inviter_info_by_account
+  {:type (list :InviterInfo)
+   :args
+   {:invitee_account {:type String}}
+   :resolve :query/inviter-info-by-account}
+  :trade_deal_info_by_account
+  {:type (list :TradeDealInfo)
+   :args
+   {:account {:type (non-null String)}}
+   :resolve :query/trade-deal-info-by-account}
+  }}
+   
+   
+ 
+  

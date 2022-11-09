@@ -10,6 +10,7 @@
   See also https://github.com/stuartsierra/component.repl"
   (:require
    [clojure.java.io :as io]
+   [clojure.edn :as edn]
    [clojure.java.javadoc :refer [javadoc]]
    [clojure.pprint :refer [pprint]]
    [clojure.reflect :refer [reflect]]
@@ -29,6 +30,12 @@
 ;; Do not try to load source code from 'resources' directory
 (clojure.tools.namespace.repl/set-refresh-dirs "dev" "src" "test")
 
+(defn load-schema-file
+  "Load schema from resource."
+  []
+  (-> (io/resource "bit-schema.edn")
+      slurp
+      edn/read-string))
 
 (defn q
   [query-string]
@@ -36,6 +43,11 @@
       :schema-provider
       :schema
       (l/execute query-string nil nil)))
+
+(comment (q "{ account_info_by_account(account: \"thefirst💯registeredbydevteamtoensuredassuccessfullylaunched20.bit\") {status manager records_info {key value} }}")
+         (q "{ rebate_info_by_account(invitee_account: \"thefirst💯registeredbydevteamtoensuredassuccessfullylaunched20.bit\") {inviter_account}}")
+         (q "{ trade_deal_info_by_account(account: \"bonjour.bit\") {account deal_type price_usd}}")
+         )
 
 (defn dev-system
   []
@@ -50,8 +62,6 @@
      :dbname (:bb-db-name config)
      :port (:bb-db-port config)
      :host (:bb-db-host config)})
-
-
 
 (set-init (fn [_] (dev-system)))
 

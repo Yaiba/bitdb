@@ -3,14 +3,14 @@
             [ring.adapter.jetty :as jetty]
             [bitdb.handler :refer [app]]))
 
-(defrecord WebServer [config http-server schema-provider database]
+(defrecord WebServer [config http-server schema-provider datasource]
   component/Lifecycle
   (start [this]
     (println ";; Starting web server")
     (if http-server
       this
       (assoc this :http-server
-             (jetty/run-jetty (app {:database database
+             (jetty/run-jetty (app {:datasource datasource
                                     :schema (:schema schema-provider)})
                               {:port (:bb-jetty-port config)
                                :join? (:bb-jetty-join config)}))))
@@ -23,5 +23,5 @@
 (defn new-web-server
   [config]
   {:server (component/using (map->WebServer {:config config})
-                            [:database :schema-provider])})
+                            [:datasource :schema-provider])})
 
